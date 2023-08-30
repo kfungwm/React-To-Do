@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { VscChecklist } from 'react-icons/vsc'
 import { VscTrash } from 'react-icons/vsc'
 import {
@@ -11,8 +11,11 @@ import {
 } from 'react-icons/lu'
 
 const TextArea = () => {
+  const storedItems = JSON.parse(localStorage.getItem('items'))
+
+  console.log(storedItems)
   const [comment, setComment] = useState('')
-  const [items, setItems] = useState([])
+  const [items, setItems] = useState(storedItems)
   const [editingIndex, setEditingIndex] = useState(-1)
   const [completedItems, setCompletedItems] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
@@ -74,6 +77,10 @@ const TextArea = () => {
   function finishEditing(index) {
     setEditingIndex(-1)
   }
+  useEffect(() => {
+    localStorage.setItem('items', JSON.stringify(items))
+    console.log(items), items
+  })
 
   return (
     <div className="relative w-full md:w-[500px] md:px-5 mx-auto">
