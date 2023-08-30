@@ -11,11 +11,8 @@ import {
 } from 'react-icons/lu'
 
 const TextArea = () => {
-  const storedItems = JSON.parse(localStorage.getItem('items'))
-
-  console.log(storedItems)
   const [comment, setComment] = useState('')
-  const [items, setItems] = useState(storedItems)
+  const [items, setItems] = useState([])
   const [editingIndex, setEditingIndex] = useState(-1)
   const [completedItems, setCompletedItems] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
@@ -27,12 +24,14 @@ const TextArea = () => {
   }
 
   function handleClick(e) {
-    setItems((prevItems) => {
-      const updatedItems = [...prevItems, { text: e, completed: false }]
-      setTotalItems(updatedItems.length)
-      return updatedItems
-    })
-    setComment('')
+    if (e.length !== 0) {
+      setItems((prevItems) => {
+        const updatedItems = [...prevItems, { text: e, completed: false }]
+        setTotalItems(updatedItems.length)
+        return updatedItems
+      })
+      setComment('')
+    }
   }
 
   function toggleCompleted(index) {
@@ -77,16 +76,40 @@ const TextArea = () => {
   function finishEditing(index) {
     setEditingIndex(-1)
   }
+
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem('items'))
+    if (storedItems) {
+      setItems(storedItems)
+    }
+  }, [])
+
   useEffect(() => {
     localStorage.setItem('items', JSON.stringify(items))
-    console.log(items), items
   })
+
+  useEffect(() => {
+    const storedCompletedItems =
+      parseInt(localStorage.getItem('completedItems')) || 0
+    const storedTotalItems = parseInt(localStorage.getItem('totalItems')) || 0
+
+    setCompletedItems(storedCompletedItems)
+    setTotalItems(storedTotalItems)
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('completedItems', completedItems.toString())
+  }, [completedItems])
+
+  useEffect(() => {
+    localStorage.setItem('totalItems', totalItems.toString())
+  }, [totalItems])
 
   return (
     <div className="relative w-full md:w-[500px] md:px-5 mx-auto">
       <div className="border-2 border-sky-500 rounded-xl md:min-h-[600px] shadow-xl p-8">
         <div className="text-center text-xl ">Todo List</div>
-        <div className="py-10">
+        <div className="py-6 ">
           <div className="align-center bg-[#f3f3f3] rounded-3xl flex justify-between ">
             <div className="pl-5 py-[15px]">
               {' '}
@@ -96,7 +119,7 @@ const TextArea = () => {
               onChange={addComment}
               value={comment}
               type="text"
-              className="border border-[#f3f3f3] bg-[#f3f3f3] outline-none p-3 w-full"
+              className="border border-[#f3f3f3] bg-[#f3f3f3] outline-none p-3 w-full rounded-3xl"
               placeholder="Add your todo"
             ></input>{' '}
             <button
@@ -105,19 +128,29 @@ const TextArea = () => {
                 handleClick(comment)
                 setComment('')
               }}
-              className="bg-[#ff5945] rounded-3xl cursor px-[40px] p-3 text-white"
+              className="bg-[#ff5945] rounded-3xl cursor px-[40px] w-full md:w-auto p-3 mt-3 md:mt-0 text-white hidden md:block"
             >
               Add
             </button>
           </div>
+          <button
+            type="submit"
+            onClick={() => {
+              handleClick(comment)
+              setComment('')
+            }}
+            className="bg-[#ff5945] rounded-3xl cursor w-full p-3 text-white mt-3 block md:hidden"
+          >
+            Add
+          </button>
         </div>
         <div className="sm:flex justify-center gap-5 mb-3">
           <div className="flex items-center  gap-1">
-            <LuLoader2 size="18px" className="mb-1" />
+            <LuLoader2 size="15px" className="mb-[1px]" />
             <span>Pending: {totalItems - completedItems}</span>
           </div>
           <div className="flex items-center  gap-1">
-            <LuCheckCircle2 size="15px" className="mb-1" />
+            <LuCheckCircle2 size="15px" className="mb-[1px]" />
             <span>Completed: {completedItems}</span>
           </div>{' '}
         </div>
@@ -150,7 +183,7 @@ const TextArea = () => {
                 {editingIndex !== index ? (
                   <button onClick={() => startEditing(index)}>
                     {' '}
-                    <LuEdit size="18px" />
+                    <LuEdit size="17px" className="mb-[1px]" />
                   </button>
                 ) : (
                   <button onClick={() => finishEditing(index)}>
