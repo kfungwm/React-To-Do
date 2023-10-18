@@ -106,8 +106,8 @@ const TextArea = () => {
   }, [totalItems])
 
   return (
-    <div className="relative w-full md:w-[500px] md:px-5 mx-auto">
-      <div className="border-2 border-sky-500 rounded-xl md:min-h-[600px] shadow-xl p-8">
+    <div className="relative w-full md:w-[500px] mx-auto ">
+      <div className="border-2 border-sky-500 rounded-xl md:min-h-[600px] shadow-xl p-8 bg-white">
         <div className="text-center text-xl ">Todo List</div>
         <div className="py-6 ">
           <div className="align-center bg-[#f3f3f3] rounded-3xl flex justify-between ">
