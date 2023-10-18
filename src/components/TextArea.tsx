@@ -11,19 +11,19 @@ import {
 } from 'react-icons/lu'
 
 const TextArea = () => {
-  const [comment, setComment] = useState('')
-  const [items, setItems] = useState([])
+  const [comment, setComment] = useState<string>('')
+  const [items, setItems] = useState<{ text: string; completed: boolean }[]>([])
   const [editingIndex, setEditingIndex] = useState(-1)
-  const [completedItems, setCompletedItems] = useState(0)
-  const [totalItems, setTotalItems] = useState(0)
+  const [completedItems, setCompletedItems] = useState<number>(0)
+  const [totalItems, setTotalItems] = useState<number>(0)
   const editTextRef = useRef<HTMLInputElement | null>(null)
 
-  function addComment(e) {
+  function addComment(e: React.ChangeEvent<HTMLInputElement>) {
     let addValue = e.target.value
     setComment(addValue)
   }
 
-  function handleClick(e) {
+  function handleClick(e: string) {
     if (e.length !== 0) {
       setItems((prevItems) => {
         const updatedItems = [...prevItems, { text: e, completed: false }]
@@ -34,7 +34,7 @@ const TextArea = () => {
     }
   }
 
-  function toggleCompleted(index) {
+  function toggleCompleted(index: number) {
     setItems((prevItems) => {
       const updatedItems = [...prevItems]
       const prevCompletionStatus = updatedItems[index].completed
@@ -47,7 +47,7 @@ const TextArea = () => {
       return updatedItems
     })
   }
-  function removeItem(e) {
+  function removeItem(e: number) {
     setItems((prevItems) => {
       const removedItem = prevItems[e]
       const updatedItems = prevItems.filter((item, index) => index !== e)
@@ -60,26 +60,36 @@ const TextArea = () => {
     })
   }
 
-  function startEditing(index) {
+  function startEditing(index: number) {
     setEditingIndex(index)
     if (editTextRef.current) {
       editTextRef.current.focus()
     }
   }
 
-  function handleEditChange(e, index) {
+  function handleEditChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) {
     const updatedItems = [...items]
     updatedItems[index].text = e.target.value
     setItems(updatedItems)
   }
 
-  function finishEditing(index) {
+  function finishEditing(index: number) {
     setEditingIndex(-1)
   }
 
+  // useEffect(() => {
+  //   const storedItems = JSON.parse(localStorage.getItem('items'))
+  //   if (storedItems) {
+  //     setItems(storedItems)
+  //   }
+  // }, [])
   useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem('items'))
-    if (storedItems) {
+    const storedItemsString = localStorage.getItem('items')
+    if (storedItemsString) {
+      const storedItems = JSON.parse(storedItemsString)
       setItems(storedItems)
     }
   }, [])
@@ -88,13 +98,25 @@ const TextArea = () => {
     localStorage.setItem('items', JSON.stringify(items))
   })
 
-  useEffect(() => {
-    const storedCompletedItems =
-      parseInt(localStorage.getItem('completedItems')) || 0
-    const storedTotalItems = parseInt(localStorage.getItem('totalItems')) || 0
+  // useEffect(() => {
+  //   const storedCompletedItems =
+  //     parseInt(localStorage.getItem('completedItems')) || 0
+  //   const storedTotalItems = parseInt(localStorage.getItem('totalItems')) || 0
 
-    setCompletedItems(storedCompletedItems)
-    setTotalItems(storedTotalItems)
+  //   setCompletedItems(storedCompletedItems)
+  //   setTotalItems(storedTotalItems)
+  // }, [])
+  useEffect(() => {
+    const storedCompletedItemsString = localStorage.getItem('completedItems')
+    const storedTotalItemsString = localStorage.getItem('totalItems')
+
+    if (storedCompletedItemsString && storedTotalItemsString) {
+      const storedCompletedItems = parseInt(storedCompletedItemsString, 10) || 0
+      const storedTotalItems = parseInt(storedTotalItemsString, 10) || 0
+
+      setCompletedItems(storedCompletedItems)
+      setTotalItems(storedTotalItems)
+    }
   }, [])
 
   useEffect(() => {
@@ -156,7 +178,7 @@ const TextArea = () => {
         </div>
         <hr className="h-px mb-8 rounded-3xl bg-gray-200 border-0 dark:bg-gray-700"></hr>
         {items.map((item, index) => (
-          <div key={index} id={index}>
+          <div key={index} id={index.toString()}>
             <div className="justify-between flex align-center gap-5 my-5">
               <input
                 type="checkbox"
